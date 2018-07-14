@@ -1,5 +1,5 @@
 webpack 配置
-------
+-----
 
 ## 配置需求与基本原则
 
@@ -13,17 +13,6 @@ NODE_ENV=development # or production
 
 ```sh
 npm i -g cross-env
-```
-
-在`package.json`中添加如下启动脚本：
-
-```json
-{
-  "scripts": {
-    "start": "cross-env NODE_ENV=development npx webpack-serve",
-    "build": "cross-env NODE_ENV=production npx webpack"
-  }
-}
 ```
 
 
@@ -56,7 +45,7 @@ Web 应用是最常见的 webpack 打包需求。由于需求多样，打包方�
 
 * `Javascript` - 主体代码
 * `Styles` - 样式
-* `Html` - 程序的入口点
+* `Page` - 程序的入口点
 * 静态资源与其他 - 图片、字体、图标、mp3声音文件等等
 
 
@@ -80,7 +69,7 @@ Web 应用是最常见的 webpack 打包需求。由于需求多样，打包方�
 }
 ```
 
-除了 host 的配置，通常为了调试接口，常需要将请求代理到后端接口，避免跨域请求，在SPA中通常还需要配置地址重定向等功能：
+除了 host 的配置，通常为了调试接口，常需要将请求代理到后端接口，避免跨域请求，在SPA中通常还需要配置请求地址重定向等功能：
 
 ```js
 {

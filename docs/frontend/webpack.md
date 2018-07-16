@@ -49,11 +49,41 @@ Web 应用是最常见的 webpack 打包需求。由于需求多样，打包方�
 * 静态资源与其他 - 图片、字体、图标、mp3声音文件等等
 
 
-### Web 开发环境配置 development
+### Web 开发环境配置
 
-#### Web 开发服务器配置
+开发环境需要配置环境为 `development`，以 React 框架为例说明配置时的要点。
 
-在一般 web 开发中，通常需要启动一个开发服务器来调试我们的代码，这里选用 `webpack-serve` 来作为开发服务器，相比较 `webpack-dev-server` 而言，前者拥有更好的开发体验。
+
+#### 项目入口及导出配置
+
+SPA入口的配置一般只有一个文件，但考虑到有打 ployfill 的必要或添加其他特殊前置依赖，这里使用数组代替单个元素：
+
+```js
+const prepend = process.env.PREPEND && process.env.PREPEND.split(',') || []
+
+entry: {
+  [process.env.ENTRY_NAME]: prepend.concat([
+    path.resolve('src/boot.js')
+  ])
+}
+```
+
+使用 `boot.js` 而不是 `index.js` 的原因是SSR时的启动文件要特殊一些，这里在 `index.js` 中导出总组件会方便SSR引用。
+
+由于是开发环境，项目导出由开发服务器接管，所以导出到根目录即可：
+
+```js
+const output = process.env.DEV_OUTPUT || '.'
+
+output: {
+  path: path.resolve(output),
+  filename: '[name].js'
+}
+```
+
+#### 开发服务器与调试工具配置
+
+在一般 web 开发中，通常需要启动一个开发服务器来调试代码，这里选用 `webpack-serve` 作为开发服务器，相比较 `webpack-dev-server` 而言，前者拥有更好的开发体验与丰富的日志信息。
 
 绑定 server 的 `host` 到 `0.0.0.0`，方便局域网内使用手机调试，但由于一些蜜汁原因，还需要配置热更客户端的端口才可以正确热更：
 
@@ -69,7 +99,7 @@ Web 应用是最常见的 webpack 打包需求。由于需求多样，打包方�
 }
 ```
 
-除了 host 的配置，通常为了调试接口，常需要将请求代理到后端接口，避免跨域请求，在SPA中通常还需要配置请求地址重定向等功能：
+除了 host 的配置，通常为了调试接口，常需要将请求代理到后端接口，使后端开发保持一致性，避免后端配置跨域头，在SPA中通常还需要配置请求地址重定向等功能：
 
 ```js
 {

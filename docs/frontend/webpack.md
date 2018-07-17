@@ -136,7 +136,9 @@ import proxy from 'http-proxy-middleware'
 import convert from 'koa-connect'
 ```
 
-为了在 chrome devtools 中调试源码，需要改写由 webpack 生成 sourcemap 的 domain 路径，默认是 `webpack:///` 为前缀的路径地址，只有改为和 chrome devtools workspace 中的地址一致，才可以成功映射到 workspace 中的文件。workspace 相关配置请参阅 chrome 修改 `output.devtoolModuleFilenameTemplate` 项：
+为了在 chrome devtools 中调试源码，需要改写由 webpack 生成 sourcemap 的 domain 路径，默认是 `webpack:///` 为前缀的路径地址，只有改为和 chrome devtools workspace 中的地址一致，才可以成功映射到 workspace 中的文件。workspace 相关配置请参阅 [chrome](chrome.md) 相关文档。
+
+修改 `output.devtoolModuleFilenameTemplate` 项：
 
 ```js
 {

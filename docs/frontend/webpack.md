@@ -83,7 +83,7 @@ output: {
 ```
 
 
-#### 各 Loader 配置
+#### Loader 配置
 
 loader 是 webpack 的核心应用，用于编译加载各类文件。由于所加载的文件通常是编译器编译之后产生的文件，所以在调试上有一定的难度，这就需要在开发时配置 SouceMap 来映射源码。常用编译器都已提供了该功能。除了调试功能外，加快 loader 编译效率也是需要在开发环境下做的，通过特殊编译选项或添加缓存，可以很好的提高编译效率，提高开发体验。
 
@@ -135,3 +135,24 @@ import history from 'connect-history-api-fallback'
 import proxy from 'http-proxy-middleware'
 import convert from 'koa-connect'
 ```
+
+为了在 chrome devtools 中调试源码，需要改写由 webpack 生成 sourcemap 的 domain 路径，默认是 `webpack:///` 为前缀的路径地址，只有改为和 chrome devtools workspace 中的地址一致，才可以成功映射到 workspace 中的文件。修改 `output.devtoolModuleFilenameTemplate` 项：
+
+```js
+{
+  devtoolModuleFilenameTemplate: info => {
+    const fmt = `file:\/\/\/${path.resolve(info.resourcePath).replace(/\\/g, '\/').replace(/(\w):/, (_, a) => a.toUpperCase() + ':')}`
+    return info.allLoaders.length && !info.allLoaders.startsWith('css')
+      ? fmt + `?${info.hash}`
+      : fmt
+  }
+}
+```
+
+上述配置可以兼容由 `css-loader` 和 `MiniCssExtractPlugin` 带来的不匹配问题，做到 `css` 源码文件的映射。
+
+配置完成后，检查 chrome devtools workspace 中的文件是否出现点亮（绿色圆点）标志，成功出现则表示配置成功。如果 css 文件也映射成功，可以在 `Elements` 面板右侧看到点亮标识。
+
+![Workspace source file mapped](https://user-images.githubusercontent.com/5752902/42808406-d8a8b628-89e5-11e8-9012-833ccd3b4c47.png)
+
+![Element style mapped](https://user-images.githubusercontent.com/5752902/42808480-00f23ca8-89e6-11e8-948f-53ee49e00793.png)

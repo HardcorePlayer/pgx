@@ -136,12 +136,17 @@ import proxy from 'http-proxy-middleware'
 import convert from 'koa-connect'
 ```
 
-为了在 chrome devtools 中调试源码，需要改写由 webpack 生成 sourcemap 的 domain 路径，默认是 `webpack:///` 为前缀的路径地址，只有改为和 chrome devtools workspace 中的地址一致，才可以成功映射到 workspace 中的文件。修改 `output.devtoolModuleFilenameTemplate` 项：
+为了在 chrome devtools 中调试源码，需要改写由 webpack 生成 sourcemap 的 domain 路径，默认是 `webpack:///` 为前缀的路径地址，只有改为和 chrome devtools workspace 中的地址一致，才可以成功映射到 workspace 中的文件。workspace 相关配置请参阅 chrome 修改 `output.devtoolModuleFilenameTemplate` 项：
 
 ```js
 {
   devtoolModuleFilenameTemplate: info => {
-    const fmt = `file:\/\/\/${path.resolve(info.resourcePath).replace(/\\/g, '\/').replace(/(\w):/, (_, a) => a.toUpperCase() + ':')}`
+    const override = path.resolve(info.resourcePath)
+      .replace(/\\/g, '\/')
+      .replace(/(\w):/, (_, a) => a.toUpperCase() + ':')
+
+    const fmt = `file:\/\/\/${override}`
+
     return info.allLoaders.length && !info.allLoaders.startsWith('css')
       ? fmt + `?${info.hash}`
       : fmt
@@ -149,9 +154,9 @@ import convert from 'koa-connect'
 }
 ```
 
-上述配置可以兼容由 `css-loader` 和 `MiniCssExtractPlugin` 带来的不匹配问题，做到 `css` 源码文件的映射。
+上述配置可以兼容由 `css-loader` 和 `MiniCssExtractPlugin` 带来的不匹配问题，从而让 `css` 文件也能映射到源码。
 
-配置完成后，检查 chrome devtools workspace 中的文件是否出现点亮（绿色圆点）标志，成功出现则表示配置成功。如果 css 文件也映射成功，可以在 `Elements` 面板右侧看到点亮标识。
+配置完成后，检查 chrome devtools workspace 中的文件是否出现点亮（绿色圆点）标志，出现则表示配置成功。如果 css 文件也映射成功，可以在 `Elements` 面板右侧看到点亮标识。
 
 ![Workspace source file mapped](https://user-images.githubusercontent.com/5752902/42808406-d8a8b628-89e5-11e8-9012-833ccd3b4c47.png)
 
